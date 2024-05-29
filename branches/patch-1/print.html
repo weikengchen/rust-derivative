@@ -1,18 +1,17 @@
 <!DOCTYPE HTML>
-<html lang="en" class="sidebar-visible no-js light">
+<html lang="en" class="light" dir="ltr">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>Derivative</title>
-        <meta name="robots" content="noindex" />
+        <meta name="robots" content="noindex">
 
 
         <!-- Custom HTML head -->
         
-        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content="#ffffff">
 
         <link rel="icon" href="favicon.svg">
         <link rel="shortcut icon" href="favicon.png">
@@ -34,15 +33,16 @@
         <link rel="stylesheet" href="doc/custom.css">
 
     </head>
-    <body>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
         <!-- Provide site root to javascript -->
-        <script type="text/javascript">
+        <script>
             var path_to_root = "";
             var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
-        <script type="text/javascript">
+        <script>
             try {
                 var theme = localStorage.getItem('mdbook-theme');
                 var sidebar = localStorage.getItem('mdbook-sidebar');
@@ -58,50 +58,81 @@
         </script>
 
         <!-- Set the theme before any content is loaded, prevents flash -->
-        <script type="text/javascript">
+        <script>
             var theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
             var html = document.querySelector('html');
-            html.classList.remove('no-js')
             html.classList.remove('light')
             html.classList.add(theme);
-            html.classList.add('js');
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
         </script>
 
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
         <!-- Hide / unhide sidebar before it is displayed -->
-        <script type="text/javascript">
-            var html = document.querySelector('html');
-            var sidebar = 'hidden';
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
             }
-            html.classList.remove('sidebar-visible');
-            html.classList.add("sidebar-" + sidebar);
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
                 <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="Clone.html"><strong aria-hidden="true">2.</strong> Copy and Clone traits</a></li><li class="chapter-item expanded "><a href="Debug.html"><strong aria-hidden="true">3.</strong> Debug trait</a></li><li class="chapter-item expanded "><a href="Default.html"><strong aria-hidden="true">4.</strong> Default trait</a></li><li class="chapter-item expanded "><a href="Hash.html"><strong aria-hidden="true">5.</strong> Hash trait</a></li><li class="chapter-item expanded "><a href="cmp.html"><strong aria-hidden="true">6.</strong> Comparison traits</a></li></ol>
             </div>
-            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
         </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
 
         <div id="page-wrapper" class="page-wrapper">
 
             <div class="page">
                                 <div id="menu-bar-hover-placeholder"></div>
-                <div id="menu-bar" class="menu-bar sticky bordered">
+                <div id="menu-bar" class="menu-bar sticky">
                     <div class="left-buttons">
-                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
                             <i class="fa fa-bars"></i>
-                        </button>
+                        </label>
                         <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
@@ -137,7 +168,7 @@
                 </div>
 
                 <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
-                <script type="text/javascript">
+                <script>
                     document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
                     document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
                     Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
@@ -167,13 +198,12 @@ just <code>derive</code>.</p>
 </tr>
 <tr class="readme-example">
 <td>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
 </span>#[derive(Derivative)]
-#[derivative(Default(bound=&quot;&quot;))]
+#[derivative(Default(bound=""))]
 pub enum Option&lt;T&gt; {
     #[derivative(Default)]
     /// No value
@@ -181,12 +211,10 @@ pub enum Option&lt;T&gt; {
     /// Some value `T`
     Some(T),
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 </td>
 <td>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">#![no_implicit_prelude]
 </span><span class="boring">extern crate core;
@@ -207,8 +235,7 @@ impl&lt;T&gt; Default for Option&lt;T&gt; {
         None
     }
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 </td>
 </tr>
 </table>
@@ -226,8 +253,7 @@ impl&lt;T&gt; Default for Option&lt;T&gt; {
 </tr>
 <tr class="readme-example">
 <td>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
@@ -235,24 +261,22 @@ impl&lt;T&gt; Default for Option&lt;T&gt; {
 #[derivative(Default)]
 pub struct RegexOptions {
     pub pats: Vec&lt;String&gt;,
-    #[derivative(Default(value=&quot;10 * (1 &lt;&lt; 20)&quot;))]
+    #[derivative(Default(value="10 * (1 &lt;&lt; 20)"))]
     pub size_limit: usize,
-    #[derivative(Default(value=&quot;2 * (1 &lt;&lt; 20)&quot;))]
+    #[derivative(Default(value="2 * (1 &lt;&lt; 20)"))]
     pub dfa_size_limit: usize,
     pub case_insensitive: bool,
     pub multi_line: bool,
     pub dot_matches_new_line: bool,
     pub swap_greed: bool,
     pub ignore_whitespace: bool,
-    #[derivative(Default(value=&quot;true&quot;))]
+    #[derivative(Default(value="true"))]
     pub unicode: bool,
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 </td>
 <td>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub struct RegexOptions {
     pub pats: Vec&lt;String&gt;,
@@ -281,8 +305,7 @@ impl Default for RegexOptions {
         }
     }
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 </td>
 </tr>
 </table>
@@ -300,20 +323,17 @@ impl Default for RegexOptions {
 </tr>
 <tr class="readme-example">
 <td>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
 </span>#[derive(Derivative)]
-#[derivative(Debug=&quot;transparent&quot;)]
+#[derivative(Debug="transparent")]
 pub struct Wrapping&lt;T&gt;(pub T);
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 </td>
 <td>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">use std::fmt;
 </span>pub struct Wrapping&lt;T&gt;(pub T);
@@ -323,8 +343,7 @@ impl&lt;T: fmt::Debug&gt; fmt::Debug for Wrapping&lt;T&gt; {
         self.0.fmt(f)
     }
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 </td>
 </tr>
 </table>
@@ -342,8 +361,7 @@ impl&lt;T: fmt::Debug&gt; fmt::Debug for Wrapping&lt;T&gt; {
 </tr>
 <tr class="readme-example">
 <td>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
@@ -365,18 +383,16 @@ pub struct Version {
     // v2 can exist such that !(v1 &lt; v2)
     // &amp;&amp; !(v1 &gt; v2) &amp;&amp; v1 != v2, which
     // violate strict total ordering rules.
-    #[derivative(PartialEq=&quot;ignore&quot;)]
-    #[derivative(Hash=&quot;ignore&quot;)]
+    #[derivative(PartialEq="ignore")]
+    #[derivative(Hash="ignore")]
     /// The build metadata, ignored when
     /// determining version precedence.
     pub build: Vec&lt;Identifier&gt;,
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 </td>
 <td>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">use std::{cmp, hash};
 </span><span class="boring">#[derive(PartialEq, Hash)]
@@ -418,8 +434,7 @@ impl hash::Hash for Version {
         self.pre.hash(into);
     }
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 </td>
 </tr>
 </table>
@@ -428,13 +443,13 @@ impl hash::Hash for Version {
 <ul>
 <li><strong>Container attributes</strong>
 <ul>
-<li><a href="Clone.html#custom-bound"><code>&lt;Copy or Clone&gt;(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
-<li><a href="Clone.html#clone-from"><code>Clone(clone_from=&quot;true&quot;)</code></a></li>
+<li><a href="Clone.html#custom-bound"><code>&lt;Copy or Clone&gt;(bound="&lt;where-clause or empty&gt;")</code></a></li>
+<li><a href="Clone.html#clone-from"><code>Clone(clone_from="true")</code></a></li>
 </ul>
 </li>
 <li><strong>Field attributes</strong>
 <ul>
-<li><a href="Clone.html#custom-bound"><code>&lt;Copy or Clone&gt;(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+<li><a href="Clone.html#custom-bound"><code>&lt;Copy or Clone&gt;(bound="&lt;where-clause or empty&gt;")</code></a></li>
 </ul>
 </li>
 </ul>
@@ -463,28 +478,27 @@ that, but can't always do it.</p>
 <ul>
 <li><strong>Container attributes</strong>
 <ul>
-<li><a href="Debug.html#custom-bound"><code>Debug(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
-<li><a href="Debug.html#hiding-newtypes"><code>Debug=&quot;transparent&quot;</code></a></li>
+<li><a href="Debug.html#custom-bound"><code>Debug(bound="&lt;where-clause or empty&gt;")</code></a></li>
+<li><a href="Debug.html#hiding-newtypes"><code>Debug="transparent"</code></a></li>
 </ul>
 </li>
 <li><strong>Variant attributes</strong>
 <ul>
-<li><a href="Debug.html#hiding-newtypes"><code>Debug=&quot;transparent&quot;</code></a></li>
+<li><a href="Debug.html#hiding-newtypes"><code>Debug="transparent"</code></a></li>
 </ul>
 </li>
 <li><strong>Field attributes</strong>
 <ul>
-<li><a href="Debug.html#custom-bound"><code>Debug(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
-<li><a href="Debug.html#format-with"><code>Debug(format_with=&quot;&lt;path&gt;&quot;)</code></a></li>
-<li><a href="Debug.html#ignoring-a-field"><code>Debug=&quot;ignore&quot;</code></a></li>
+<li><a href="Debug.html#custom-bound"><code>Debug(bound="&lt;where-clause or empty&gt;")</code></a></li>
+<li><a href="Debug.html#format-with"><code>Debug(format_with="&lt;path&gt;")</code></a></li>
+<li><a href="Debug.html#ignoring-a-field"><code>Debug="ignore"</code></a></li>
 </ul>
 </li>
 </ul>
 <h1 id="ignoring-a-field"><a class="header" href="#ignoring-a-field">Ignoring a field</a></h1>
 <p>You can use <em>derivative</em> to hide fields from a structure or enumeration <code>Debug</code>
 implementation:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
@@ -492,44 +506,40 @@ implementation:</p>
 #[derivative(Debug)]
 struct Foo {
     foo: u8,
-    #[derivative(Debug=&quot;ignore&quot;)]
+    #[derivative(Debug="ignore")]
     bar: u8,
 }
 
-println!(&quot;{:?}&quot;, Foo { foo: 42, bar: 1 }); // Foo { foo: 42 }
-<span class="boring">}
-</span></code></pre></pre>
+println!("{:?}", Foo { foo: 42, bar: 1 }); // Foo { foo: 42 }
+<span class="boring">}</span></code></pre></pre>
 <h1 id="hiding-newtypes"><a class="header" href="#hiding-newtypes">Hiding newtypes</a></h1>
 <p>You can use <em>derivative</em> to automatically unwrap newtypes and enumeration
 variants with only one field:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
 </span>#[derive(Derivative)]
-#[derivative(Debug=&quot;transparent&quot;)]
+#[derivative(Debug="transparent")]
 struct A(isize);
 
 #[derive(Derivative)]
 #[derivative(Debug)]
 enum C {
     Foo(u8),
-    #[derivative(Debug=&quot;transparent&quot;)]
+    #[derivative(Debug="transparent")]
     Bar(u8),
 }
 
-println!(&quot;{:?}&quot;, A(42)); // 42
-println!(&quot;{:?}&quot;, C::Bar(42)); // 42
+println!("{:?}", A(42)); // 42
+println!("{:?}", C::Bar(42)); // 42
 
 // But:
-println!(&quot;{:?}&quot;, C::Foo(42)); // Foo(42)
-<span class="boring">}
-</span></code></pre></pre>
+println!("{:?}", C::Foo(42)); // Foo(42)
+<span class="boring">}</span></code></pre></pre>
 <h1 id="format-with"><a class="header" href="#format-with">Format with</a></h1>
 <p>You can pass a field to a format function:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
@@ -544,24 +554,21 @@ println!(&quot;{:?}&quot;, C::Foo(42)); // Foo(42)
 #[derivative(Debug)]
 struct Foo {
     foo: u32,
-    #[derivative(Debug(format_with=&quot;path::to::my_fmt_fn&quot;))]
+    #[derivative(Debug(format_with="path::to::my_fmt_fn"))]
     bar: SomeTypeThatMightNotBeDebug,
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>The field <code>bar</code> will be displayed with <code>path::to::my_fmt_fn(&amp;bar, &amp;mut fmt)</code>
 where <code>fmt</code> is the current <a href="https://doc.rust-lang.org/std/fmt/struct.Formatter.html"><code>Formatter</code></a>.</p>
 <p>The function must the following prototype:</p>
-<pre><code class="language-rust ignore">fn fmt(&amp;T, &amp;mut std::fmt::Formatter) -&gt; Result&lt;(), std::fmt::Error&gt;;
-</code></pre>
+<pre><code class="language-rust ignore">fn fmt(&amp;T, &amp;mut std::fmt::Formatter) -&gt; Result&lt;(), std::fmt::Error&gt;;</code></pre>
 <h1 id="custom-bound-1"><a class="header" href="#custom-bound-1">Custom bound</a></h1>
 <p>Usually, <em>derivative</em> will add a <code>T: Debug</code> bound for each type parameter <code>T</code>
 of the current type. If you do not want that, you can specify an explicit bound:</p>
 <ul>
 <li>Either on the type. This replaces all bounds:</li>
 </ul>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
@@ -570,19 +577,17 @@ of the current type. If you do not want that, you can specify an explicit bound:
 </span><span class="boring">}
 </span><span class="boring">use std::fmt::Debug;
 </span>#[derive(Derivative)]
-#[derivative(Debug(bound=&quot;T: Debug, U: MyDebug&quot;))]
+#[derivative(Debug(bound="T: Debug, U: MyDebug"))]
 struct Foo&lt;T, U&gt; {
     foo: T,
-    #[derivative(Debug(format_with=&quot;MyDebug::my_fmt&quot;))]
+    #[derivative(Debug(format_with="MyDebug::my_fmt"))]
     bar: U,
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <ul>
 <li>Or on a field. This replaces the bound <em>derivative</em> guessed for that field. The example below is equivalent to the above:</li>
 </ul>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
@@ -593,17 +598,15 @@ struct Foo&lt;T, U&gt; {
 #[derivative(Debug)]
 struct Foo&lt;T, U&gt; {
     foo: T,
-    #[derivative(Debug(format_with=&quot;MyDebug::my_fmt&quot;, bound=&quot;U: MyDebug&quot;))]
+    #[derivative(Debug(format_with="MyDebug::my_fmt", bound="U: MyDebug"))]
     bar: U,
 }
-<span class="boring">}
-</span></code></pre></pre>
-<p>With <code>bound=&quot;&quot;</code> it is possible to remove any bound for the type. This is useful
+<span class="boring">}</span></code></pre></pre>
+<p>With <code>bound=""</code> it is possible to remove any bound for the type. This is useful
 if your type contains a <code>Foo&lt;T&gt;</code> that is <code>Debug</code> even if <code>T</code> is not.</p>
 <h1 id="packed-structures"><a class="header" href="#packed-structures">Packed structures</a></h1>
 <p>You can use <em>derivative</em> to implement <code>Debug</code> on packed structures. Unlike the standard <code>derive(debug)</code>, <em>derivative</em> does not require the structure itself to be <code>Copy</code>, but like the standard <code>derive(debug)</code>, it requires each (non-ignored) field to be <code>Copy</code>.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
@@ -613,18 +616,17 @@ if your type contains a <code>Foo&lt;T&gt;</code> that is <code>Debug</code> eve
 struct Foo {
     foo: u8,
     // `String` isn't `Copy` so it must be ignored to derive `Debug`
-    #[derivative(Debug=&quot;ignore&quot;)]
+    #[derivative(Debug="ignore")]
     bar: String,
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="custom-attributes-2"><a class="header" href="#custom-attributes-2">Custom attributes</a></h1>
 <p>The <code>Default</code> trait supports the following attributes:</p>
 <ul>
 <li><strong>Container attributes</strong>
 <ul>
-<li><a href="Default.html#custom-bound"><code>Default(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
-<li><a href="Default.html#new-function"><code>Default=&quot;new&quot;</code></a></li>
+<li><a href="Default.html#custom-bound"><code>Default(bound="&lt;where-clause or empty&gt;")</code></a></li>
+<li><a href="Default.html#new-function"><code>Default="new"</code></a></li>
 </ul>
 </li>
 <li><strong>Variant attributes</strong>
@@ -634,8 +636,8 @@ struct Foo {
 </li>
 <li><strong>Field attributes</strong>
 <ul>
-<li><a href="Default.html#custom-bound"><code>Default(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
-<li><a href="Default.html#setting-the-value-of-a-field"><code>Default(value=&quot;&lt;expr&gt;&quot;)</code></a></li>
+<li><a href="Default.html#custom-bound"><code>Default(bound="&lt;where-clause or empty&gt;")</code></a></li>
+<li><a href="Default.html#setting-the-value-of-a-field"><code>Default(value="&lt;expr&gt;")</code></a></li>
 </ul>
 </li>
 </ul>
@@ -643,8 +645,7 @@ struct Foo {
 <p>You can use <em>derivative</em> to derive a default implementation on enumerations!
 This does not work with <em>rustc</em>'s <code>#[derive(Default)]</code>.
 All you need is to specify what variant is the default value:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
@@ -656,14 +657,12 @@ enum Enum {
     B,
 }
 
-println!(&quot;{:?}&quot;, Enum::default()); // B
-<span class="boring">}
-</span></code></pre></pre>
+println!("{:?}", Enum::default()); // B
+<span class="boring">}</span></code></pre></pre>
 <h1 id="setting-the-value-of-a-field"><a class="header" href="#setting-the-value-of-a-field">Setting the value of a field</a></h1>
 <p>You can use <em>derivative</em> to change the default value of a field in a <code>Default</code>
 implementation:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
@@ -671,36 +670,32 @@ implementation:</p>
 #[derivative(Default)]
 struct Foo {
     foo: u8,
-    #[derivative(Default(value=&quot;42&quot;))]
+    #[derivative(Default(value="42"))]
     bar: u8,
 }
 
-println!(&quot;{:?}&quot;, Foo::default()); // Foo { foo: 0, bar: 42 }
-<span class="boring">}
-</span></code></pre></pre>
+println!("{:?}", Foo::default()); // Foo { foo: 0, bar: 42 }
+<span class="boring">}</span></code></pre></pre>
 <h1 id="new-function"><a class="header" href="#new-function"><code>new</code> function</a></h1>
 <p>You can use <em>derivative</em> to derive a convenience <code>new</code> method for your type
 that calls <code>Default::default</code>:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
 </span>#[derive(Debug, Derivative)]
-#[derivative(Default(new=&quot;true&quot;))]
+#[derivative(Default(new="true"))]
 struct Foo {
     foo: u8,
     bar: u8,
 }
 
-println!(&quot;{:?}&quot;, Foo::new()); // Foo { foo: 0, bar: 0 }
-<span class="boring">}
-</span></code></pre></pre>
+println!("{:?}", Foo::new()); // Foo { foo: 0, bar: 0 }
+<span class="boring">}</span></code></pre></pre>
 <h1 id="custom-bound-2"><a class="header" href="#custom-bound-2">Custom bound</a></h1>
 <p>The following does not work because <code>derive</code> adds a <code>T: Default</code> bound on the
 <code>impl Default for Foo&lt;T&gt;</code>:</p>
-<pre><pre class="playground"><code class="language-rust compile_fail edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust compile_fail edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
@@ -714,18 +709,16 @@ struct NonDefault;
 Foo::&lt;NonDefault&gt;::default(); // gives:
 // error: no associated item named `default` found for type `Foo&lt;NonDefault&gt;` in the current scope
 //  = note: the method `default` exists but the following trait bounds were not satisfied: `NonDefault : std::default::Default`
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>That bound however is useless as <code>Option&lt;T&gt;: Default</code> for any <code>T</code>.
 <code>derivative</code> allows you to explicitly specify a bound if the inferred one is not
 correct:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
 </span>#[derive(Derivative)]
-#[derivative(Default(bound=&quot;&quot;))] // don't need any bound
+#[derivative(Default(bound=""))] // don't need any bound
 struct Foo&lt;T&gt; {
     foo: Option&lt;T&gt;,
 }
@@ -733,28 +726,26 @@ struct Foo&lt;T&gt; {
 struct NonDefault;
 
 Foo::&lt;NonDefault&gt;::default(); // works!
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="custom-attributes-3"><a class="header" href="#custom-attributes-3">Custom attributes</a></h1>
 <p>The <code>Hash</code> trait supports the following attributes:</p>
 <ul>
 <li><strong>Container attributes</strong>
 <ul>
-<li><a href="Hash.html#custom-bound"><code>Hash(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+<li><a href="Hash.html#custom-bound"><code>Hash(bound="&lt;where-clause or empty&gt;")</code></a></li>
 </ul>
 </li>
 <li><strong>Field attributes</strong>
 <ul>
-<li><a href="Hash.html#custom-bound"><code>Hash(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
-<li><a href="Hash.html#hash-with"><code>Hash(hash_with=&quot;&lt;path&gt;&quot;)</code></a></li>
-<li><a href="Hash.html#ignoring-a-field"><code>Hash=&quot;ignore&quot;</code></a></li>
+<li><a href="Hash.html#custom-bound"><code>Hash(bound="&lt;where-clause or empty&gt;")</code></a></li>
+<li><a href="Hash.html#hash-with"><code>Hash(hash_with="&lt;path&gt;")</code></a></li>
+<li><a href="Hash.html#ignoring-a-field"><code>Hash="ignore"</code></a></li>
 </ul>
 </li>
 </ul>
 <h1 id="ignoring-a-field-1"><a class="header" href="#ignoring-a-field-1">Ignoring a field</a></h1>
 <p>You can use <em>derivative</em> to ignore fields from a <code>Hash</code> implementation:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
@@ -762,7 +753,7 @@ Foo::&lt;NonDefault&gt;::default(); // works!
 #[derivative(Hash)]
 struct Foo {
     foo: u8,
-    #[derivative(Hash=&quot;ignore&quot;)]
+    #[derivative(Hash="ignore")]
     bar: i32,
 }
 
@@ -779,12 +770,10 @@ struct Bar {
 </span><span class="boring">}
 </span><span class="boring">
 </span>assert_eq!(hash(&amp;Foo { foo: 42, bar: -1337 }), hash(&amp;Bar { foo: 42 }));
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <h1 id="hash-with"><a class="header" href="#hash-with">Hash with</a></h1>
 <p>You can pass a field to a hash function:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
@@ -799,16 +788,14 @@ struct Bar {
 #[derivative(Hash)]
 struct Foo {
     foo: u32,
-    #[derivative(Hash(hash_with=&quot;path::to::my_hash_fn&quot;))]
+    #[derivative(Hash(hash_with="path::to::my_hash_fn"))]
     bar: SomeTypeThatMightNotBeHash,
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>The field <code>bar</code> will be hashed with <code>path::to::my_hash_fn(&amp;bar, &amp;mut state)</code>
 where <code>state</code> is the current <a href="https://doc.rust-lang.org/std/hash/trait.Hasher.html"><code>Hasher</code></a>.</p>
 <p>The function must the following prototype:</p>
-<pre><code class="language-rust ignore">fn my_hash_fn&lt;H&gt;(&amp;T, state: &amp;mut H) where H: Hasher;
-</code></pre>
+<pre><code class="language-rust ignore">fn my_hash_fn&lt;H&gt;(&amp;T, state: &amp;mut H) where H: Hasher;</code></pre>
 <h1 id="limitations-1"><a class="header" href="#limitations-1">Limitations</a></h1>
 <p>On structure, <code>derivative(Hash)</code> will produce the same hash as <code>derive(Hash)</code>.
 On unions however, it will produces the same hashes <em>only for unitary
@@ -821,12 +808,12 @@ See <a href="Debug.html#custom-bound"><code>Debug</code>'s documentation</a> for
 <ul>
 <li><strong>Container attributes</strong>
 <ul>
-<li><a href="cmp.html#custom-bound"><code>&lt;CmpTrait&gt;(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+<li><a href="cmp.html#custom-bound"><code>&lt;CmpTrait&gt;(bound="&lt;where-clause or empty&gt;")</code></a></li>
 </ul>
 </li>
 <li><strong>Field attributes</strong>
 <ul>
-<li><a href="cmp.html#custom-bound"><code>&lt;CmpTrait&gt;(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+<li><a href="cmp.html#custom-bound"><code>&lt;CmpTrait&gt;(bound="&lt;where-clause or empty&gt;")</code></a></li>
 </ul>
 </li>
 </ul>
@@ -834,13 +821,13 @@ See <a href="Debug.html#custom-bound"><code>Debug</code>'s documentation</a> for
 <ul>
 <li><strong>Container attributes</strong>
 <ul>
-<li><a href="cmp.html#enumerations"><code>&lt;CmpTrait&gt;=&quot;feature_allow_slow_enum&quot;</code></a></li>
+<li><a href="cmp.html#enumerations"><code>&lt;CmpTrait&gt;="feature_allow_slow_enum"</code></a></li>
 </ul>
 </li>
 <li><strong>Field attributes</strong>
 <ul>
-<li><a href="cmp.html#ignoring-a-field"><code>&lt;CmpTrait&gt;=&quot;ignore&quot;</code></a></li>
-<li><a href="cmp.html#compare-with"><code>&lt;CmpTrait&gt;(compare_with=&quot;&lt;path&gt;&quot;)</code></a></li>
+<li><a href="cmp.html#ignoring-a-field"><code>&lt;CmpTrait&gt;="ignore"</code></a></li>
+<li><a href="cmp.html#compare-with"><code>&lt;CmpTrait&gt;(compare_with="&lt;path&gt;")</code></a></li>
 </ul>
 </li>
 </ul>
@@ -849,15 +836,13 @@ See <a href="Debug.html#custom-bound"><code>Debug</code>'s documentation</a> for
 <p>Unfortunately, there is no way for derivative to derive <code>PartialOrd</code> or <code>Ord</code> on
 enumerations as efficiently as the built-in <code>derive(…)</code> yet.</p>
 <p>If you want to use derivative on enumerations anyway, you can add</p>
-<pre><code class="language-rust ignore">#[derivative(PartialOrd=&quot;feature_allow_slow_enum&quot;)]
-</code></pre>
+<pre><code class="language-rust ignore">#[derivative(PartialOrd="feature_allow_slow_enum")]</code></pre>
 <p>to your enumeration. This acts as a “feature-gate”.</p>
 <p>This attribute is also allowed for <code>PartialEq</code> for historical reason. It is not
 necessary anymore as of v2.1.0. It was never necessary nor allowed for <code>Eq</code>.</p>
 <h1 id="ignoring-a-field-2"><a class="header" href="#ignoring-a-field-2">Ignoring a field</a></h1>
 <p>You can use <em>derivative</em> to ignore a field when comparing:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
@@ -865,19 +850,17 @@ necessary anymore as of v2.1.0. It was never necessary nor allowed for <code>Eq<
 #[derivative(PartialEq)]
 struct Foo {
     foo: u8,
-    #[derivative(PartialEq=&quot;ignore&quot;)]
+    #[derivative(PartialEq="ignore")]
     bar: u8,
 }
 
 assert!(Foo { foo: 0, bar: 42 } == Foo { foo: 0, bar: 7});
 assert!(Foo { foo: 42, bar: 0 } != Foo { foo: 7, bar: 0});
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <h1 id="compare-with"><a class="header" href="#compare-with">Compare with</a></h1>
 <p>Usually fields are compared using <code>==</code>, <code>PartialOrd::partial_cmp</code> or <code>Ord::cmp</code>. You can use an alternative comparison
 function if you like:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
@@ -892,41 +875,38 @@ function if you like:</p>
 #[derivative(PartialEq)]
 struct Foo {
     foo: u32,
-    #[derivative(PartialEq(compare_with=&quot;path::to::my_cmp_fn&quot;))]
+    #[derivative(PartialEq(compare_with="path::to::my_cmp_fn"))]
     bar: SomeTypeThatMightNotBePartialEq,
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p><code>foo</code> will be compared with <code>==</code> and <code>bar</code> will be compared with
 <code>path::to::my_cmp_fn</code> which must have the following prototype:</p>
-<table><thead><tr><th>Trait</th><th>Signature</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Trait</th><th>Signature</th></tr></thead><tbody>
 <tr><td><code>PartialEq</code></td><td><span class="rust"><code>fn my_cmp_fn(&amp;T, &amp;T) -&gt; bool;</code></span></td></tr>
 <tr><td><code>PartialOrd</code></td><td><span class="rust"><code>fn my_cmp_fn(&amp;T, &amp;T) -&gt; std::option::Option&lt;std::cmp::Ordering&gt;;</code></span></td></tr>
 <tr><td><code>Ord</code></td><td><span class="rust"><code>fn my_cmp_fn(&amp;T, &amp;T) -&gt; std::cmp::Ordering;</code></span></td></tr>
 </tbody></table>
+</div>
 <h1 id="custom-bound-4"><a class="header" href="#custom-bound-4">Custom bound</a></h1>
 <p>Usually if you derive <code>CmpTrait</code>, a <code>T: CmpTrait</code> bound is added for each type parameter <code>T</code>. You can use
 override this behavior if the inferred bound is not correct for you.</p>
 <p>Eg. comparing raw pointers does not require the type to be <code>Eq</code>, so you could
 use:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
 </span>#[derive(Derivative)]
 #[derivative(PartialEq)]
 struct WithPtr&lt;T: ?Sized&gt; {
-    #[derivative(PartialEq(bound=&quot;&quot;))]
+    #[derivative(PartialEq(bound=""))]
     foo: *const T
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 <p>See <a href="./Default.html#custom-bound"><code>Default</code>'s documentation</a> for more details.</p>
 <h1 id="packed-structures-1"><a class="header" href="#packed-structures-1">Packed structures</a></h1>
 <p>You can use <em>derivative</em> to implement the comparison traits on packed structures. Unlike the standard <code>derive</code>, <em>derivative</em> does not require the structure itself to be <code>Copy</code>, but like the standard <code>derive</code>, it requires each (non-ignored) field to be <code>Copy</code>.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">extern crate derivative;
 </span><span class="boring">use derivative::Derivative;
@@ -935,11 +915,10 @@ struct WithPtr&lt;T: ?Sized&gt; {
 #[repr(C, packed)]
 struct Foo {
     f: u32,
-    #[derivative(PartialEq = &quot;ignore&quot;)]
+    #[derivative(PartialEq = "ignore")]
     t: String,
 }
-<span class="boring">}
-</span></code></pre></pre>
+<span class="boring">}</span></code></pre></pre>
 
                     </main>
 
@@ -961,26 +940,27 @@ struct Foo {
 
 
 
-        <script type="text/javascript">
+        <script>
             window.playground_copyable = true;
         </script>
 
 
-        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
 
-        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
-        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
 
         <!-- Custom JS scripts -->
 
-        <script type="text/javascript">
+        <script>
         window.addEventListener('load', function() {
             window.setTimeout(window.print, 100);
         });
         </script>
 
+    </div>
     </body>
 </html>
